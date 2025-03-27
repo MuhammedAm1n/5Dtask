@@ -1,6 +1,13 @@
-# task
+# Meal Tracker App
 
-A new Flutter project.
+A Flutter application for tracking meals and calories.
+
+## Features
+- Add meals with name, calories, and photo
+- View meal history
+- Sort meals by name, calories, or time
+- Delete meals
+- Local storage using SQLite
 
 ## Getting Started
 
