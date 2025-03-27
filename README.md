@@ -4,4 +4,4 @@
 - Sort meals by name, calories, or time
 - Delete meals
 - Local storage using SQLite
-
+-Integrated Api
