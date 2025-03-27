@@ -20,10 +20,11 @@ class _AddMealFormState extends State<AddMealForm> {
   final _caloriesController = TextEditingController();
   String? _photoPath;
   final _imagePicker = ImagePicker();
+  bool _isLoading = false;
 
   Future<void> _pickImage() async {
     try {
-      // Request camera permission
+      setState(() => _isLoading = true);
       final status = await Permission.camera.request();
       if (status.isGranted) {
         final XFile? image = await _imagePicker.pickImage(
@@ -51,6 +52,10 @@ class _AddMealFormState extends State<AddMealForm> {
           const SnackBar(content: Text('Failed to access camera')),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -64,7 +69,6 @@ class _AddMealFormState extends State<AddMealForm> {
         photoPath: _photoPath,
       );
       widget.onMealAdded(meal);
-      Navigator.pop(context);
     }
   }
 
@@ -72,54 +76,91 @@ class _AddMealFormState extends State<AddMealForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Meal Name'),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a meal name';
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _caloriesController,
-            decoration: const InputDecoration(labelText: 'Calories'),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter calories';
-              }
-              if (int.tryParse(value) == null) {
-                return 'Please enter a valid number';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _pickImage,
-            icon: const Icon(Icons.camera_alt),
-            label: const Text('Take Photo'),
-          ),
-          if (_photoPath != null) ...[
-            const SizedBox(height: 8),
-            Image.file(
-              File(_photoPath!),
-              height: 100,
-              width: 100,
-              fit: BoxFit.cover,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Meal Name',
+                prefixIcon: Icon(Icons.restaurant),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a meal name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _caloriesController,
+              decoration: const InputDecoration(
+                labelText: 'Calories',
+                prefixIcon: Icon(Icons.local_fire_department),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter calories';
+                }
+                if (int.tryParse(value) == null) {
+                  return 'Please enter a valid number';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+            if (_photoPath != null) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    Image.file(
+                      File(_photoPath!),
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() => _photoPath = null),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.black.withValues(alpha :0.5),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            ElevatedButton.icon(
+              onPressed: _isLoading ? null : _pickImage,
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.camera_alt),
+              label: Text(_photoPath == null ? 'Take Photo' : 'Change Photo'),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _submitForm,
+              child: const Text('Add Meal'),
             ),
           ],
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _submitForm,
-            child: const Text('Add Meal'),
-          ),
-        ],
+        ),
       ),
     );
   }
