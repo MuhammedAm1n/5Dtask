@@ -13,8 +13,7 @@ class MealSearchScreen extends StatefulWidget {
   State<MealSearchScreen> createState() => _MealSearchScreenState();
 }
 
-class _MealSearchScreenState extends State<MealSearchScreen>
-    with WidgetsBindingObserver {
+class _MealSearchScreenState extends State<MealSearchScreen> {
   final _searchController = TextEditingController();
   String? _selectedCategory;
   Timer? _debounceTimer;
@@ -23,7 +22,6 @@ class _MealSearchScreenState extends State<MealSearchScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     // Load categories when screen is initialized
     context.read<MealApiCubit>().loadCategories();
   }
@@ -32,27 +30,7 @@ class _MealSearchScreenState extends State<MealSearchScreen>
   void dispose() {
     _searchController.dispose();
     _debounceTimer?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // Reload categories when app resumes
-      if (!_isSearching && _selectedCategory == null) {
-        context.read<MealApiCubit>().loadCategories();
-      }
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Reload categories when screen regains focus
-    if (!_isSearching && _selectedCategory == null) {
-      context.read<MealApiCubit>().loadCategories();
-    }
   }
 
   void _resetSearchState() {
