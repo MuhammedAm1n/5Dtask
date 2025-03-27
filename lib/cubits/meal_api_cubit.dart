@@ -42,4 +42,18 @@ class MealApiCubit extends Cubit<MealApiState> {
       emit(MealApiError('Failed to filter meals: $e'));
     }
   }
+
+  Future<void> getMealDetails(String id) async {
+    emit(MealApiLoading());
+    try {
+      final meal = await apiService.getMealDetails(id);
+      if (meal != null) {
+        emit(MealDetailSuccess(meal));
+      } else {
+        emit(MealApiError('Meal not found'));
+      }
+    } catch (e) {
+      emit(MealApiError('Failed to load meal details: $e'));
+    }
+  }
 }

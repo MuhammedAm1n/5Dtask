@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubits/meal_api_cubit.dart';
 import '../cubits/states/meal_api_state.dart';
+import '../screens/meal_detail_screen.dart';
 import 'dart:async';
 
 class MealSearchScreen extends StatefulWidget {
@@ -191,6 +192,13 @@ class _MealSearchScreenState extends State<MealSearchScreen> {
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    MealDetailScreen(meal: meal),
+                              ),
+                            );
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

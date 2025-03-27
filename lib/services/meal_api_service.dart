@@ -78,5 +78,24 @@ class MealApiService {
     }
   }
 
-  
+  Future<MealApi?> getMealDetails(String id) async {
+    try {
+      final response =
+          await _dio.get('/lookup.php', queryParameters: {'i': id});
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['meals'] == null || (data['meals'] as List).isEmpty) {
+          return null;
+        }
+        return MealApi.fromJson(data['meals'][0]);
+      } else {
+        throw Exception('Failed to get meal details: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Error getting meal details: $e');
+    }
+  }
 }
